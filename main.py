@@ -1,19 +1,17 @@
 import time
 
+import pygame
+
 import pyautogui as gui
 from pyjoycon import ButtonEventJoyCon, get_R_id, get_L_id
 
-POLL_RATE = 1/2000 # in s, ie 1/Hz
-MOUSE_SPEED = 100000 # in px/s
-SCROLL_SPEED = 10000
-INVERT_SCROLL = 1
+from utils import *
 
-joyconR = ButtonEventJoyCon(*get_R_id())
-joyconL = ButtonEventJoyCon(*get_L_id())
-
-MODE = "mouse" # "mouse" or "keyboard"
-FAST_MODE = False
-joyconR.home_led_on()
+FPS = 1000 # in frames per second
+MOUSE_SPEED = 800 # in px/s
+SCROLL_SPEED = 100 # in px/s
+INVERT_SCROLL = 1 # direction of scrolling
+WINDOW_SIZE = 360 # in px
 
 # Features:
 #   - Switch between mouse or keyboard mode by pressing the home button. Home button light is on if in mouse mode
@@ -25,11 +23,39 @@ joyconR.home_led_on()
 #       - Right click with X
 #       - Double click with B
 
-def rumble(device):
-    device._RUMBLE_DATA = b"\x05\x10\x10\x05\x05\x10\x10\x05"
-    device._write_output_report(b'\x10', b'', b'')
+joyconR = ButtonEventJoyCon(*get_R_id())
+joyconL = ButtonEventJoyCon(*get_L_id())
+global screen
+def mouse_mode():
+    global screen
+    joyconR.home_led_on()
+    screen = hide_window()
 
-while 1:
+def keyboard_mode():
+    global screen
+    joyconR.home_led_off()
+    screen = show_window(WINDOW_SIZE, desktop_w, desktop_h)
+
+pygame.font.init()
+TXTFONT = pygame.font.Font(None, TXTSIZE)
+TXTFONT.set_bold(True)
+
+MODE = "mouse" # "mouse" or "keyboard"
+FAST_MODE = False
+pygame.init()
+_infoObject = pygame.display.Info()
+desktop_w, desktop_h = _infoObject.current_w, _infoObject.current_h
+mouse_mode() if MODE == "mouse" else keyboard_mode()
+
+clock = pygame.time.Clock()
+running = True
+while running:
+    dt = clock.tick(FPS) / 1000
+
+    for event in pygame.event.get():  
+        if event.type == pygame.QUIT: 
+            running = False
+
     for event_type, status in joyconL.events():
         pass
         #print("L", event_type, status)
@@ -39,10 +65,7 @@ while 1:
         if event_type == "home" and status == 1:
             MODE = "mouse" if MODE == "keyboard" else "keyboard"
             rumble(joyconR)
-            if MODE == "mouse":
-                joyconR.home_led_on()
-            else:
-                joyconR.home_led_off()
+            mouse_mode() if MODE == "mouse" else keyboard_mode()
         
         # things in mouse mode
         if MODE == "mouse":
@@ -57,18 +80,60 @@ while 1:
                 gui.rightClick()
             if event_type == "b" and status == 1:
                 gui.doubleClick()
-        print(event_type, status)
 
-    L_status = joyconL.get_status()
-    x = L_status['analog-sticks']['left']['horizontal']
-    y = -L_status['analog-sticks']['left']['vertical']
-    multiplier = 1. if FAST_MODE else 0.25
-    if x != 0 or y != 0:
-        gui.moveRel(x * multiplier * MOUSE_SPEED * POLL_RATE, y * multiplier * MOUSE_SPEED * POLL_RATE)
+    if MODE == "mouse":
+        L_status = joyconL.get_status()
+        x = L_status['analog-sticks']['left']['horizontal']
+        y = -L_status['analog-sticks']['left']['vertical']
+        multiplier = 1. if FAST_MODE else 0.25
+        if x != 0 or y != 0:
+            gui.moveRel(int(x * multiplier * MOUSE_SPEED * dt), int(y * multiplier * MOUSE_SPEED * dt))
 
-    R_status = joyconR.get_status()
-    y = INVERT_SCROLL * R_status['analog-sticks']['right']['vertical']
-    if y != 0:
-        gui.scroll(y * multiplier * SCROLL_SPEED * POLL_RATE)
+        R_status = joyconR.get_status()
+        y = INVERT_SCROLL * R_status['analog-sticks']['right']['vertical']
+        if y != 0:
+            gui.scroll(int(y * multiplier * SCROLL_SPEED * dt))
+    else:
+        screen.fill((0,0,0))
+        selectedSet = BASE_SET
+        #Determine where the stick's pointing and which petal to select.  -1 means no petal is selected.
+        xPos = 0 #gamepad.get_axis(0)
+        yPos = 0 #gamepad.get_axis(1)
 
-    time.sleep(POLL_RATE)
+        petal = -1
+        if xPos >= .75:
+            if yPos >= .75:
+                petal = 3
+            elif yPos <= -.75:
+                petal = 1
+            else:
+                petal = 2
+
+        elif xPos <= -.75:
+            if yPos >= .75:
+                petal = 5
+            elif yPos <= -.75:
+                petal = 7
+            else:
+                petal = 6
+
+        else:
+            if yPos >= .75:
+                petal = 4
+            elif yPos <= -.75:
+                petal = 0
+
+        # if facePress and petal != -1:
+        #     for i in range(4):
+        #         if BUTTONS[i] == faceButton:
+        #            kbEmu.tap_key(selectedSet[petal][i])
+        #Blit and schtuff
+        for i in range(8):
+            colors = False
+            if i == petal:
+                colors = True
+
+            petalSurf = getPetalSurf(selectedSet[i], TXTFONT, colors)
+            screen.blit(petalSurf, PETAL_COORDS[i])
+
+        pygame.display.update()

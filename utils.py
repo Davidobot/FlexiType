@@ -6,18 +6,21 @@ def rumble(device):
     device._write_output_report(b'\x10', b'', b'')
 
 def show_window(WINDOW_SIZE, desktop_w, desktop_h ):
+    pygame.display.quit()
     background_colour = (0, 0, 0) 
+    pygame.display.set_caption('FlexiType')
     screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE), pygame.NOFRAME) 
     screen.fill(background_colour) 
 
     window = Window.from_display_module()
-    window.position = ((desktop_w - WINDOW_SIZE)/2, desktop_h-WINDOW_SIZE)
+    window.position = ((desktop_w - WINDOW_SIZE)/2, desktop_h-WINDOW_SIZE*1.4)
 
     pygame.display.flip() 
     return screen
 
 def hide_window():
-    screen = pygame.display.set_mode((1, 1),  pygame.HIDDEN) 
+    pygame.display.quit()
+    screen = pygame.display.set_mode((10, 10),  pygame.HIDDEN) 
     pygame.display.flip() 
     return screen
 
@@ -27,10 +30,10 @@ GREEN = (0,255,0)
 BLUE = (0,0,255)
 YELLOW = (255,255,0)
 
-PETAL_COORDS = [(120,0), (240,0), (240,120), (240,240), (120,240), (0,240), (0,120), (0,0)]
+PETAL_COORDS = [(100,0), (200,0), (200,100), (200,200), (100,200), (0,200), (0,100), (0,0)]
 
 #XYBA
-TXTSIZE = 32
+TXTSIZE = 24
 BUTTONS = [0, 3, 2, 1]
 COLORS = [BLUE, YELLOW, RED, GREEN]
 COORDS = [(0, TXTSIZE), (TXTSIZE, 0), (TXTSIZE * 2, TXTSIZE), (TXTSIZE, TXTSIZE * 2)]

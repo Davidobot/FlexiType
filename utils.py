@@ -34,12 +34,16 @@ PETAL_COORDS = [(100,0), (200,0), (200,100), (200,200), (100,200), (0,200), (0,1
 
 #XYBA
 TXTSIZE = 24
+SMALL_TXTSIZE = 16
 BUTTONS = [0, 3, 2, 1]
 COLORS = [BLUE, YELLOW, RED, GREEN]
 COORDS = [(0, TXTSIZE), (TXTSIZE, 0), (TXTSIZE * 2, TXTSIZE), (TXTSIZE, TXTSIZE * 2)]
+BS = TXTSIZE * 3
+SMALL_COORDS = [(0, (BS - SMALL_TXTSIZE)/2), ((BS - 3*SMALL_TXTSIZE)/2, 0), (BS - 3*SMALL_TXTSIZE, (BS - SMALL_TXTSIZE)/2), ((BS - 3*SMALL_TXTSIZE)/2, BS - SMALL_TXTSIZE)]
 BASE_SET = ['abcd', 'efgh', 'ijkl', 'mnop', 'qrst', 'uvwx', 'yz,.', ':/@-']
 CAPS_SET = ['ABCD', 'EFGH', 'IJKL', 'MNOP', 'QRST', 'UVWX', 'YZ?!', ';\\&_']
 NUMS_SET = ['1234', '5678', '90*+', 'xx$`', '\'"~|', '=#%^', '<>[]', '{}()']
+EXTRA_SET = [['DEL', 'BCK', 'BAR', 'RET'], ['<--', '^^^', '-->', 'DWN'], ['F1', 'F2', 'F3', 'F4']]
 
 def getPetalSurf(petalString, TXTFONT, colors=False):
     petalSurf = pygame.surface.Surface((TXTSIZE * 3, TXTSIZE * 3)) # A square
@@ -48,5 +52,15 @@ def getPetalSurf(petalString, TXTFONT, colors=False):
             petalSurf.blit(TXTFONT.render(petalString[i], True, WHITE), COORDS[i])
         elif colors == True:
             petalSurf.blit(TXTFONT.render(petalString[i], True, COLORS[i]), COORDS[i])
+
+    return petalSurf
+
+def getExtraSurf(petalString, TXTFONT, colors=False):
+    petalSurf = pygame.surface.Surface((TXTSIZE * 3, TXTSIZE * 3)) # A square
+    for i in range(4):
+        if colors == False:
+            petalSurf.blit(TXTFONT.render(petalString[i], True, WHITE), SMALL_COORDS[i])
+        elif colors == True:
+            petalSurf.blit(TXTFONT.render(petalString[i], True, COLORS[i]), SMALL_COORDS[i])
 
     return petalSurf

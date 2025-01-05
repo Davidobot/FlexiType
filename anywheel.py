@@ -38,6 +38,7 @@ COORDS = [(0, TXTSIZE), (TXTSIZE, 0), (TXTSIZE * 2, TXTSIZE), (TXTSIZE, TXTSIZE 
 BASE_SET = ['abcd', 'efgh', 'ijkl', 'mnop', 'qrst', 'uvwx', 'yz,.', ':/@-']
 CAPS_SET = ['ABCD', 'EFGH', 'IJKL', 'MNOP', 'QRST', 'UVWX', 'YZ?!', ';\\&_']
 NUMS_SET = ['1234', '5678', '90*+', 'xx$`', '\'"~|', '=#%^', '<>[]', '{}()']
+EXTRA_SET = ['1234', '⌫↵␡␛']
 
 
 def getPetalSurf(petalString, colors=False):
@@ -120,9 +121,6 @@ def main():
                     pass
                    # kbEmu.tap_key(selectedSet[petal][i])
                 
-
-
-
         #Blit and schtuff
         for i in range(8):
             colors = False
@@ -132,10 +130,6 @@ def main():
             petalSurf = getPetalSurf(selectedSet[i], colors)
             window.blit(petalSurf, PETAL_COORDS[i])
 
-
-
-
-        
         pygame.display.update()
 
 main()

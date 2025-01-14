@@ -78,15 +78,12 @@ MODE = "mouse" # "mouse" or "keyboard"
 FAST_MODE = False
 pygame.init()
 
-# icon = pygame.image.load('icon.png') 
-# pygame.display.set_icon(icon)
-
 _infoObject = pygame.display.Info()
 desktop_w, desktop_h = _infoObject.current_w, _infoObject.current_h
 mouse_mode() if MODE == "mouse" else keyboard_mode()
 
 buttons_index = {'x': 1, 'a': 2, 'b': 3, 'y': 0}
-extras = [['delete', 'backspace', 'space', 'return'],
+extras = [['delete', 'return', 'space', 'backspace'],
         ['left', 'up', 'right', 'down'],
         ['f1', 'f2', 'f3', 'f4']]
 clock = pygame.time.Clock()

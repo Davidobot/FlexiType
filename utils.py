@@ -1,5 +1,7 @@
 import pygame
 from pygame._sdl2.video import Window
+import sys
+import os
 
 def rumble(device):
     device._RUMBLE_DATA = b"\x05\x10\x10\x05\x05\x10\x10\x05"
@@ -9,6 +11,11 @@ def show_window(WINDOW_SIZE, desktop_w, desktop_h ):
     pygame.display.quit()
     background_colour = (0, 0, 0) 
     pygame.display.set_caption('FlexiType')
+    if getattr(sys, 'frozen', False):
+        icon = pygame.image.load(os.path.join(sys._MEIPASS, 'icons/flexitype-icon.png'))
+    else:
+        icon = pygame.image.load('icons/flexitype-icon.png') 
+    pygame.display.set_icon(icon)
     screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE), pygame.NOFRAME) 
     screen.fill(background_colour) 
 
@@ -20,6 +27,11 @@ def show_window(WINDOW_SIZE, desktop_w, desktop_h ):
 
 def hide_window():
     pygame.display.quit()
+    if getattr(sys, 'frozen', False):
+        icon = pygame.image.load(os.path.join(sys._MEIPASS, 'icons/flexitype-icon.png'))
+    else:
+        icon = pygame.image.load('icons/flexitype-icon.png') 
+    pygame.display.set_icon(icon)
     screen = pygame.display.set_mode((10, 10),  pygame.HIDDEN) 
     pygame.display.flip() 
     return screen
@@ -43,7 +55,7 @@ SMALL_COORDS = [(0, (BS - SMALL_TXTSIZE)/2), ((BS - 3*SMALL_TXTSIZE)/2, 0), (BS 
 BASE_SET = ['abcd', 'efgh', 'ijkl', 'mnop', 'qrst', 'uvwx', 'yz,.', ':/@-']
 CAPS_SET = ['ABCD', 'EFGH', 'IJKL', 'MNOP', 'QRST', 'UVWX', 'YZ?!', ';\\&_']
 NUMS_SET = ['1234', '5678', '90*+', 'xx$`', '\'"~|', '=#%^', '<>[]', '{}()']
-EXTRA_SET = [['DEL', 'BCK', 'BAR', 'RET'], ['<--', '^^^', '-->', 'DWN'], ['F1', 'F2', 'F3', 'F4']]
+EXTRA_SET = [['DEL', 'RET', 'SPC', 'BCK'], ['<--', '^^^', '-->', 'DWN'], ['F1', 'F2', 'F3', 'F4']]
 
 def getPetalSurf(petalString, TXTFONT, colors=False):
     petalSurf = pygame.surface.Surface((TXTSIZE * 3, TXTSIZE * 3)) # A square
